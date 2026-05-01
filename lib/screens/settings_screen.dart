@@ -31,7 +31,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           const ListTile(
             leading: Icon(Icons.info_outline),
             title: Text('Hakkında'),
-            subtitle: Text('Arı Yabancı Dil • v0.1'),
+            subtitle: Text('Arı Yabancı Dil v0.1'),
           ),
         ],
       ),

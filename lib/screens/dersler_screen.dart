@@ -24,11 +24,6 @@ class DerslerScreen extends StatelessWidget {
             leading: const Icon(Icons.menu_book),
             title: Text(baslik),
             trailing: const Icon(Icons.chevron_right),
-            onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('$baslik dersi yakında!')),
-              );
-            },
           );
         },
       ),
