@@ -1,14 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'login_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key, required this.username});
+  const ProfileScreen({super.key});
 
-  final String username;
+  Future<void> _logout(BuildContext context) async {
+    await Supabase.instance.client.auth.signOut();
+    if (!context.mounted) return;
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (_) => const LoginScreen()),
+      (_) => false,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final email = Supabase.instance.client.auth.currentUser?.email ?? '';
     return Scaffold(
       appBar: AppBar(title: const Text('Profil')),
       body: ListView(
@@ -28,26 +37,16 @@ class ProfileScreen extends StatelessWidget {
           const SizedBox(height: 12),
           Center(
             child: Text(
-              username,
+              email,
               style: theme.textTheme.titleLarge,
             ),
           ),
           const SizedBox(height: 24),
           const Divider(height: 1),
-          const ListTile(
-            leading: Icon(Icons.email_outlined),
-            title: Text('E-posta'),
-            subtitle: Text('eklenmedi'),
-          ),
-          const ListTile(
-            leading: Icon(Icons.school_outlined),
-            title: Text('Seviye'),
-            subtitle: Text('Başlangıç'),
-          ),
-          const ListTile(
-            leading: Icon(Icons.emoji_events_outlined),
-            title: Text('Tamamlanan Dersler'),
-            subtitle: Text('0'),
+          ListTile(
+            leading: const Icon(Icons.email_outlined),
+            title: const Text('E-posta'),
+            subtitle: Text(email.isEmpty ? 'eklenmedi' : email),
           ),
           const Divider(height: 1),
           Padding(
@@ -55,11 +54,7 @@ class ProfileScreen extends StatelessWidget {
             child: OutlinedButton.icon(
               icon: const Icon(Icons.logout),
               label: const Text('Çıkış Yap'),
-              onPressed: () {
-                Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(builder: (_) => const LoginScreen()),
-                );
-              },
+              onPressed: () => _logout(context),
             ),
           ),
         ],

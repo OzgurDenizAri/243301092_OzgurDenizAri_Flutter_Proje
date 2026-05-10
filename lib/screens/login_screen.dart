@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'home_screen.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'register_screen.dart';
+import 'ogrenci_ana_sayfa.dart';
+import 'ogretmen_ana_sayfa.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -9,27 +12,72 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _userController = TextEditingController();
+  final _emailController = TextEditingController();
   final _passController = TextEditingController();
   String? _error;
+  bool _loading = false;
 
   @override
   void dispose() {
-    _userController.dispose();
+    _emailController.dispose();
     _passController.dispose();
     super.dispose();
   }
 
-  void _login() {
-    final user = _userController.text.trim();
+  Future<void> _login() async {
+    final email = _emailController.text.trim();
     final pass = _passController.text;
-    if (user == 'admin' && pass == '1234') {
+
+    if (email.isEmpty || pass.isEmpty) {
+      setState(() => _error = 'E-posta ve şifre gerekli');
+      return;
+    }
+
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
+
+    final supabase = Supabase.instance.client;
+    try {
+      final res = await supabase.auth.signInWithPassword(
+        email: email,
+        password: pass,
+      );
+      final user = res.user;
+      if (user == null) {
+        throw 'Giriş yapılamadı';
+      }
+
+      final profile = await supabase
+          .from('profiller')
+          .select('rol')
+          .eq('id', user.id)
+          .single();
+      final rol = profile['rol'] as String?;
+
+      if (!mounted) return;
+      Widget target;
+      if (rol == 'ogrenci') {
+        target = const OgrenciAnaSayfa();
+      } else if (rol == 'ogretmen') {
+        target = const OgretmenAnaSayfa();
+      } else {
+        throw 'Tanımsız rol';
+      }
+
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => HomeScreen(username: user)),
+        MaterialPageRoute(builder: (_) => target),
       );
-    } else {
-      setState(() => _error = 'Kullanıcı adı veya şifre hatalı');
+    } on AuthException catch (e) {
+      setState(() => _error = e.message);
+    } on PostgrestException catch (e) {
+      setState(() => _error = e.message);
+    } catch (e) {
+      setState(() => _error = e.toString());
+    } finally {
+      if (mounted) setState(() => _loading = false);
     }
   }
 
@@ -56,11 +104,12 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 32),
                 TextField(
-                  controller: _userController,
+                  controller: _emailController,
+                  keyboardType: TextInputType.emailAddress,
                   textInputAction: TextInputAction.next,
                   decoration: const InputDecoration(
-                    labelText: 'Kullanıcı Adı',
-                    prefixIcon: Icon(Icons.person_outline),
+                    labelText: 'E-posta',
+                    prefixIcon: Icon(Icons.email_outlined),
                     border: OutlineInputBorder(),
                   ),
                 ),
@@ -81,18 +130,33 @@ class _LoginScreenState extends State<LoginScreen> {
                   Text(
                     _error!,
                     style: TextStyle(color: theme.colorScheme.error),
+                    textAlign: TextAlign.center,
                   ),
                 ],
                 const SizedBox(height: 24),
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: _login,
-                    child: const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 12),
-                      child: Text('Giriş Yap'),
+                    onPressed: _loading ? null : _login,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      child: _loading
+                          ? const SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : const Text('Giriş Yap'),
                     ),
                   ),
+                ),
+                const SizedBox(height: 8),
+                TextButton(
+                  onPressed: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const RegisterScreen()),
+                  ),
+                  child: const Text('Hesabın yok mu? Kayıt ol'),
                 ),
               ],
             ),
