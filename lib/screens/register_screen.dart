@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../services/islem_log.dart';
 import 'login_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -65,6 +66,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
         'email': email,
         'cinsiyet': _cinsiyet,
       });
+
+      await kaydetIslemLog(
+        islem: 'kayit',
+        tabloAdi: 'profiller',
+        aciklama: _rol,
+      );
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(

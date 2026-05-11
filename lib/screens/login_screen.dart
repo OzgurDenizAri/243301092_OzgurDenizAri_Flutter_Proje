@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../services/islem_log.dart';
 import 'register_screen.dart';
 import 'ogrenci_ana_sayfa.dart';
 import 'ogretmen_ana_sayfa.dart';
@@ -48,6 +49,12 @@ class _LoginScreenState extends State<LoginScreen> {
       if (user == null) {
         throw 'Giriş yapılamadı';
       }
+
+      await kaydetIslemLog(
+        islem: 'giris',
+        tabloAdi: 'auth',
+        aciklama: email,
+      );
 
       final profile = await supabase
           .from('profiller')

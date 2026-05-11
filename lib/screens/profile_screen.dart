@@ -1,12 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../services/islem_log.dart';
 import 'login_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
   Future<void> _logout(BuildContext context) async {
-    await Supabase.instance.client.auth.signOut();
+    final supabase = Supabase.instance.client;
+    final email = supabase.auth.currentUser?.email ?? '';
+    await kaydetIslemLog(
+      islem: 'cikis',
+      tabloAdi: 'auth',
+      aciklama: email,
+    );
+    await supabase.auth.signOut();
     if (!context.mounted) return;
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(builder: (_) => const LoginScreen()),

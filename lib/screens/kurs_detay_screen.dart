@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../services/islem_log.dart';
 
 class KursDetayScreen extends StatefulWidget {
   const KursDetayScreen({super.key, required this.kurs});
@@ -37,6 +38,12 @@ class _KursDetayScreenState extends State<KursDetayScreen> {
         'kursid': widget.kurs['kursid'],
         'ogrenciid': ogrenci['ogrenciid'],
       });
+
+      await kaydetIslemLog(
+        islem: 'kursa_kayit',
+        tabloAdi: 'kurskayit',
+        aciklama: (widget.kurs['kursadi'] ?? '').toString(),
+      );
 
       if (!mounted) return;
       setState(() {
