@@ -5,6 +5,7 @@ build/
 .packages
 .pub-cache/
 .pub/
+.claude/
 
 .idea/
 .vscode/
