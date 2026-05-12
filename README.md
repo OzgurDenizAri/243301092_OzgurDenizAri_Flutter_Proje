@@ -15,11 +15,11 @@ Flutter ile geliştirilmiş, Supabase altyapılı bir dil okulu yönetim uygulam
 ## Test Hesapları
 
 **Öğrenci:**  
-E-posta: ilbeycavga@gmail.com  
+E-posta: 243301092@test.com  
 Şifre: 123456
 
 **Öğretmen:**  
-E-posta: oktay@mail.com  
+E-posta: ogretmen.test@mail.com  
 Şifre: 123456
 
 ## Ekran Görüntüleri
